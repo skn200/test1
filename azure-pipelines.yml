@@ -1,0 +1,11 @@
+# Starter pipeline
+pool:
+ vmImage: ubuntu-latest
+  
+steps:
+- task: SSH@0
+  inputs:
+    sshEndpoint: 'DL-Dev'
+    runOptions: 'commands'
+    commands: 'date >> /tmp/cron_out'
+    readyTimeout: '20000'
