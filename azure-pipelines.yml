@@ -3,37 +3,9 @@ pool:
  vmImage: ubuntu-latest
   
 steps:
-- task: SSH@0
+- task: AzureCLI@2
   inputs:
-    sshEndpoint: 'DL-Dev'
-    runOptions: 'commands'
-    commands: 'date >> /tmp/cron_out'
-    readyTimeout: '20000'
-
-- task: CmdLine@2
-  inputs:
-    script: |
-      #!/usr/bin/env bash
-      
-      ## AZ cli for querying LB backened nat pool for ssh and do docker code update
-      
-      _AZ_RG='dailylearn-prod-app-rg'
-      _AZ_LB_NAME='dtest-vmss-lb-n1'
-      _CONTAINER_NAME='mycontainer'
-      _IMAGE_NAME='dailylearnbackend.azurecr.io/dlapp:latest'
-      
-      public_ip_id=$(az network lb show -g $_AZ_RG --name $_AZ_LB_NAME --query "frontendIpConfigurations[].publicIpAddress.id" -o tsv)
-      
-      PublicIP=$(az network public-ip show --ids $public_ip_id --query ipAddress -o tsv)
-      
-      
-      function update_code {
-          ssh -o StrictHostKeyChecking=no -l azureuser -p $1 $PublicIP "sudo docker stop \$(sudo docker ps -q) ; sudo docker pull $_IMAGE_NAME ;sudo docker rm $_CONTAINER_NAME; sudo docker run -d --name $_CONTAINER_NAME -p 8080:8080 $_IMAGE_NAME"
-      }
-      
-      
-      for port in $(az network lb inbound-nat-rule list -g $_AZ_RG --lb-name $_AZ_LB_NAME --query '[].{IP:frontendPort}' -o tsv)
-      do
-         update_code  $port
-      done
-
+    azureSubscription: '`6d63db4c-a5ee-43e6-8cc5-36ef2e7b52d3`' #Authorize and in the task editor
+    ScriptType: 'pscore'
+    scriptLocation: 'inlineScript'
+    Inline: 'az vmss extension set --resource-group dailylearn-prod-app-rg --vmss-name test-vmss-n2 --name CustomScript  --force-update    --publisher Microsoft.Azure.Extensions    --version "2.0"    --settings '{"fileUris": ["https://dailylearnprodsa.blob.core.windows.net/dlscripts/dl-prod-deploy.sh?sp=r&st=2021-11-15T10:13:00Z&se=2021-11-16T18:13:00Z&spr=https&sv=2020-08-04&sr=b&sig=v13SoQ9MMN0JPk5dYwAjFRwF8e2dH9gNs%2FgtmrqbWxc%3D"],"commandToExecute": "sh dl-prod-deploy.sh"}''
