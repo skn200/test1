@@ -3,10 +3,9 @@ pool:
  vmImage: ubuntu-latest
   
 steps:
-
 - task: AzureCLI@2
   inputs:
     azureSubscription: 'dailylearn-prod(6d63db4c-a5ee-43e6-8cc5-36ef2e7b52d3)'
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
-    inlineScript: 'az vmss extension set --resource-group dailylearn-prod-app-rg --vmss-name test-vmss-n2 --name CustomScript  --force-update    --publisher Microsoft.Azure.Extensions    --version "2.0"    --settings '{"fileUris": ["https://dailylearnprodsa.blob.core.windows.net/dlscripts/dl-prod-deploy.sh?sp=r&st=2021-11-15T10:13:00Z&se=2021-11-16T18:13:00Z&spr=https&sv=2020-08-04&sr=b&sig=v13SoQ9MMN0JPk5dYwAjFRwF8e2dH9gNs%2FgtmrqbWxc%3D"],"commandToExecute": "sh dl-prod-deploy.sh"}''
+    inlineScript: 'az vmss extension set --resource-group dailylearn-prod-app-rg --vmss-name test-vmss-n2 --name CustomScript  --force-update    --publisher Microsoft.Azure.Extensions    --version "2.0"    --settings ''{"fileUris": ["https://dailylearnprodsa.blob.core.windows.net/dlscripts/dl-prod-deploy.sh?sp=r&st=2021-11-15T10:13:00Z&se=2021-11-16T18:13:00Z&spr=https&sv=2020-08-04&sr=b&sig=v13SoQ9MMN0JPk5dYwAjFRwF8e2dH9gNs%2FgtmrqbWxc%3D"],"commandToExecute": "sh dl-prod-deploy.sh"}'''
